@@ -1,0 +1,15 @@
+<!--
+	This brings up a simulation of the Fetch mobile manipulation robot in a small
+	office environment using the Gazebo simulation environment.
+-->
+
+
+<launch>
+
+	<!-- Start Gazebo with models for the Fetch in a small office. -->
+	<include file="$(find fetch_gazebo)/launch/playground.launch" />
+
+	<!-- Start all of the stuff on the robot needed to navigate around the world. -->
+	<include file="$(find fetch_gazebo_demo)/launch/fetch_nav.launch" />
+
+</launch>
