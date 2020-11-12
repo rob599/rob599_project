@@ -1,8 +1,8 @@
 <?xml version="1.0"?>
 <package format="2">
-  <name>fetch_project</name>
+  <name>fetch_project_moveit_config</name>
   <version>0.0.0</version>
-  <description>The fetch_project package</description>
+  <description>The fetch_project_moveit_config package</description>
 
   <!-- One maintainer tag required, multiple allowed, one person per tag -->
   <!-- Example:  -->
@@ -19,7 +19,7 @@
   <!-- Url tags are optional, but multiple are allowed, one per tag -->
   <!-- Optional attribute type can be: website, bugtracker, or repository -->
   <!-- Example: -->
-  <!-- <url type="website">http://wiki.ros.org/fetch_project</url> -->
+  <!-- <url type="website">http://wiki.ros.org/fetch_project_moveit_config</url> -->
 
 
   <!-- Author tags are optional, multiple are allowed, one per tag -->

@@ -5,7 +5,7 @@
   <arg     if="$(arg debug)" name="launch_prefix" value="gdb --ex run --args" />
 
   <!-- Start demo -->
-  <node name="marker" launch-prefix="$(arg launch_prefix)" pkg="fetch_disinfectant_project_moveit_config"
+  <node name="marker" launch-prefix="$(arg launch_prefix)" pkg="fetch_project_moveit_config"
 	type="marker" output="screen">
   </node>
 

@@ -1,9 +1,0 @@
-<launch>
-
- <include file="$(find fetch_project)/launch/cone_marker.launch" />
-
- <include file="$(find octomap_server)/launch/octomap_mapping.launch" />
-
- <node type="rviz" name="rviz" pkg="rviz" args="-d $(find fetch_project)/rviz/default.rviz" />
-
-</launch>
