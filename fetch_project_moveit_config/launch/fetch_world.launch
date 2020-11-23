@@ -6,8 +6,24 @@
 
 <launch>
 
-	<!-- Start Gazebo with models for the Fetch in a small office. -->
-	<include file="$(find fetch_gazebo)/launch/playground.launch" />
+ <!-- Start Gazebo with models for the Fetch in a small office. -->
+ <arg name="robot" default="fetch"/>
+ <arg name="debug" default="false"/>
+ <arg name="gui" default="true"/>
+ <arg name="headless" default="false"/>
+
+ <!-- Start Gazebo with a blank world -->
+ <include file="$(find gazebo_ros)/launch/empty_world.launch">
+	 <arg name="debug" value="$(arg debug)" />
+	 <arg name="gui" value="$(arg gui)" />
+	 <arg name="paused" value="false"/>
+	 <arg name="use_sim_time" value="true"/>
+	 <arg name="headless" value="$(arg headless)"/>
+	 <arg name="world_name" value="$(find fetch_project_moveit_config)/worlds/short_table.world"/>
+ </include>
+
+ <!-- Oh, you wanted a robot? -->
+ <include file="$(find fetch_gazebo)/launch/include/$(arg robot).launch.xml" />
 
 	<!-- Start all of the stuff on the robot needed to navigate around the world. -->
 	<include file="$(find fetch_gazebo_demo)/launch/fetch_nav.launch" />

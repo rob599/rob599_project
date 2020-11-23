@@ -18,8 +18,4 @@
  <!-- Start rviz with custom rviz config file  -->
  <node type="rviz" name="rviz" pkg="rviz" args="-d $(find fetch_project_moveit_config)/rviz/default.rviz" />
 
-  <!-- Start Convex Hull, Plane Fitting, GUI, Waypoint Generator, and Move Group Interface nodes -->
- <!-- <node pkg="fetch_disinfectant_project_moveit_config" type="convex_hull.py"        name="convex_hull"        output="screen"/>
- <node pkg="fetch_disinfectant_project_moveit_config" type="plane_fitting.py"      name="plane_fitting"      output="screen"/> -->
-
 </launch>
