@@ -504,13 +504,13 @@
       </link>
       <static>0</static>
       <allow_auto_disable>1</allow_auto_disable>
-      <pose frame=''>2 0 0 0 -0 0</pose>
+      <pose frame=''>2.25692 -0.142631 0 0 -0 0</pose>
     </model>
     <state world_name='default'>
-      <sim_time>371 549000000</sim_time>
-      <real_time>372 618897869</real_time>
-      <wall_time>1605832604 113144810</wall_time>
-      <iterations>371549</iterations>
+      <sim_time>54 604000000</sim_time>
+      <real_time>54 803073470</real_time>
+      <wall_time>1606169638 686311037</wall_time>
+      <iterations>54604</iterations>
       <model name='ground_plane'>
         <pose frame=''>0 0 0 0 -0 0</pose>
         <scale>1 1 1</scale>
@@ -522,13 +522,13 @@
         </link>
       </model>
       <model name='table_short'>
-        <pose frame=''>1 -0 -4e-06 -3e-06 4e-06 1.5708</pose>
+        <pose frame=''>2 -0 -2e-06 -2e-06 -2e-06 1.5708</pose>
         <scale>1 1 1</scale>
         <link name='link'>
-          <pose frame=''>1 -0 -4e-06 -3e-06 4e-06 1.5708</pose>
+          <pose frame=''>2 -0 -2e-06 -2e-06 -2e-06 1.5708</pose>
           <velocity>0 0 0 0 -0 0</velocity>
-          <acceleration>0 0 -9.8 0 -0 0</acceleration>
-          <wrench>0 0 -9.8 0 -0 0</wrench>
+          <acceleration>0 0 -3.59641 1.03433 -0.865783 3.14159</acceleration>
+          <wrench>0 0 -3.59641 0 -0 0</wrench>
         </link>
       </model>
       <light name='sun'>
@@ -537,7 +537,7 @@
     </state>
     <gui fullscreen='0'>
       <camera name='user_camera'>
-        <pose frame=''>0.185102 -5.80267 4.14645 -0 0.531642 1.3562</pose>
+        <pose frame=''>2.31728 -0.350833 5.95696 -1e-06 1.5698 1.65618</pose>
         <view_controller>orbit</view_controller>
         <projection_type>perspective</projection_type>
       </camera>

@@ -25,7 +25,6 @@
  <!-- Oh, you wanted a robot? -->
  <include file="$(find fetch_gazebo)/launch/include/$(arg robot).launch.xml" />
 
-	<!-- Start all of the stuff on the robot needed to navigate around the world. -->
-	<include file="$(find fetch_gazebo_demo)/launch/fetch_nav.launch" />
+
 
 </launch>
