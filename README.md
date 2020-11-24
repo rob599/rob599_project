@@ -33,5 +33,5 @@ roslaunch fetch_project_moveit_config fetch_world.launch
 roslaunch fetch_project_moveit_config rviz_setup.launch
 roslaunch fetch_project_moveit_config run_nodes.launch
 ```
-
+Click on the publish point feature and then click on one of the cubes in the octomap. This should populate an interactive marker at the location of the cube. 
 
