@@ -1,0 +1,7 @@
+<launch>
+
+  <!-- Start Convex Hull, Plane Fitting, GUI, Waypoint Generator, and Move Group Interface nodes -->
+  <node pkg="fetch_project_moveit_config" type="convex_hull.py"   name="convex_hull"  output="screen"/>
+  <node pkg="fetch_project_moveit_config" type="create_interactive_markers.py"  name="create_interactive_markers"  output="screen"/>
+
+</launch>
