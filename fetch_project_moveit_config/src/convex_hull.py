@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 
 # Import what we need
 import rospy
@@ -21,8 +21,10 @@ class Convex_hull:
         self.IM_array_sub = rospy.Subscriber('IM_pose_array',numpy_msg(Floats), self.best_fit_plane_callback, queue_size=1)
 
         # Initialize Publishers
-        self.convex_hull_pub = rospy.Publisher('convex_hull',PolygonStamped, queue_size=1)
-        self.plane_pub = rospy.Publisher('best_fit_plane', Marker, queue_size = 1)
+        self.convex_hull_pub  = rospy.Publisher('convex_hull'           , PolygonStamped, queue_size=1)
+        self.plane_poly_pub   = rospy.Publisher('best_fit_plane_poly'   , PolygonStamped, queue_size=1)
+        self.plane_marker_pub = rospy.Publisher('best_fit_plane_marker' , Marker        , queue_size=1)
+
 
         # Setup header
         self.header = Header()
@@ -32,6 +34,10 @@ class Convex_hull:
         # Setup PolygonStamped for convex hull of Interactive Markers (IM's)
         self.convex_hull_polygon = PolygonStamped()
         self.convex_hull_polygon.header = self.header
+
+        # Setup PolygonStamped for best fit plane
+        self.plane_polygon = PolygonStamped()
+        self.plane_polygon.header = self.header
 
         # Create triangle_list marker to fill in best fit plane
         self.plane_marker = Marker()
@@ -83,7 +89,7 @@ class Convex_hull:
 
         else:
             # Sepearately store the components (XYZ) of the IM's
-            for i in range(len(arr_msg.data)/3):
+            for i in range(int(len(arr_msg.data)/3)):
                 self.X.append(arr_msg.data[i*3 + 0])
                 self.Y.append(arr_msg.data[i*3 + 1])
                 self.Z.append(arr_msg.data[i*3 + 2])
@@ -129,6 +135,7 @@ class Convex_hull:
         self.proj_x = []
         self.proj_y = []
         self.proj_z = []
+
         # forloop to compute the projections of each IM
         for i in range(len(self.X)):
             # Make a vector from the origin points to the IM's location.
@@ -238,16 +245,21 @@ class Convex_hull:
     def convex_hull(self):
         # Run convex hull function on 2D sub-plane coordinates.
         hull = ConvexHull(self.coordinates_2D)
-        poly_points = []
+
+        plane_points = []
+        IM_points    = []
 
         for e in hull.vertices:
-            poly_points.append(Point32(self.X[e],self.Y[e],self.Z[e]))
+            plane_points.append(Point32(self.proj_x[e],self.proj_y[e],self.proj_z[e]))
+            IM_points.append(Point32(self.X[e],self.Y[e],self.Z[e]))
 
-        # Assign convex_points to the PolygonStamped
-        self.convex_hull_polygon.polygon.points = poly_points
-
-        # Publish the PolygonStamped
+        # Assign IM_points to convex_hull_polygon and publish it.
+        self.convex_hull_polygon.polygon.points = IM_points
         self.convex_hull_pub.publish(self.convex_hull_polygon)
+
+        # Assign plane_points to plane_polygon and publish it.
+        self.plane_polygon.polygon.points = plane_points
+        self.plane_poly_pub.publish(self.plane_polygon)
 
         # Begin triangulation of the polygon
         self.triangulation_polygon()
@@ -265,7 +277,7 @@ class Convex_hull:
 
         # Assign triangulation_points to plane_marker.points and publish
         self.plane_marker.points = triangulation_points
-        self.plane_pub.publish(self.plane_marker)
+        self.plane_marker_pub.publish(self.plane_marker)
 
         # Begin clear_parameters function
         self.clear_parameters()
