@@ -9,7 +9,7 @@ sudo apt-get update
 sudo apt-get install ros-melodic-rviz-visual-tools
 ```
 
-You also need to pip install:
+You also need to pip3 install:
 * rospkg
 * scipy
 * sympy
