@@ -16,7 +16,6 @@ class Create_Interactive_Markers:
         self.clicked_point_sub = rospy.Subscriber('clicked_point', PointStamped, self.makeInteractiveMarker)
 
         # Initialize Publishers
-        # self.IM_list_pub = rospy.Publisher('IM_pose_list',List, queue_size=1)
         self.IM_array_pub = rospy.Publisher('IM_pose_array',numpy_msg(Floats), queue_size=1)
 
         # Setup header for Interactive Markers (IM)

@@ -21,10 +21,11 @@ class Convex_hull:
         self.IM_array_sub = rospy.Subscriber('IM_pose_array',numpy_msg(Floats), self.best_fit_plane_callback, queue_size=1)
 
         # Initialize Publishers
-        self.convex_hull_pub  = rospy.Publisher('convex_hull'           , PolygonStamped, queue_size=1)
-        self.plane_poly_pub   = rospy.Publisher('best_fit_plane_poly'   , PolygonStamped, queue_size=1)
-        self.plane_marker_pub = rospy.Publisher('best_fit_plane_marker' , Marker        , queue_size=1)
-
+        self.convex_hull_pub  = rospy.Publisher('convex_hull'           , PolygonStamped   , queue_size=1)
+        self.plane_poly_pub   = rospy.Publisher('best_fit_plane_poly'   , PolygonStamped   , queue_size=1)
+        self.plane_marker_pub = rospy.Publisher('best_fit_plane_marker' , Marker           , queue_size=1)
+        self.M_inv_array_pub  = rospy.Publisher('M_inv_array'           ,numpy_msg(Floats) , queue_size=1)
+        self.coord_array_pub  = rospy.Publisher('coord_array'       ,numpy_msg(Floats) , queue_size=1)
 
         # Setup header
         self.header = Header()
@@ -264,6 +265,12 @@ class Convex_hull:
         # Begin triangulation of the polygon
         self.triangulation_polygon()
 
+        # Begin clear_parameters function
+        self.clear_parameters()
+
+        # Begin array_publisher function
+        self.array_publisher()
+
 
     def triangulation_polygon(self):
         # Run Delaunay function on the self.coodinates to get all the vertices
@@ -279,13 +286,17 @@ class Convex_hull:
         self.plane_marker.points = triangulation_points
         self.plane_marker_pub.publish(self.plane_marker)
 
-        # Begin clear_parameters function
-        self.clear_parameters()
 
     def clear_parameters(self):
         # wipe the previous data from lists
         del self.X[:],self.Y[:],self.Z[:]
         del self.proj_x[:],self.proj_y[:],self.proj_z[:]
+
+
+    def array_publisher(self):
+
+        self.M_inv_array_pub.publish(self.M_inv.ravel())
+        self.coord_array_pub.publish(self.coordinates_2D.ravel())
 
 
 
