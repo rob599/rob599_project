@@ -252,10 +252,10 @@ class Convex_hull:
             self.plane_polygon.polygon.points.append(Point32(self.proj_x[e],self.proj_y[e],self.proj_z[e]))
             self.IM_polygon.polygon.points.append(Point32(self.X[e],self.Y[e],self.Z[e]))
 
-        # Assign IM_points to convex_hull_polygon and publish it.
+        # Publish IM_polygon.
         self.IM_poly_pub.publish(self.IM_polygon)
 
-        # Assign plane_points to plane_polygon and publish it.
+        # Publish Plane_polygon.
         self.plane_poly_pub.publish(self.plane_polygon)
 
         # Begin triangulation of the polygon
