@@ -1,5 +1,8 @@
+#!/usr/bin/env python3
+
 """
 Grid based sweep planner
+
 author: Atsushi Sakai
 """
 
@@ -12,7 +15,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from scipy.spatial.transform import Rotation as Rot
 
-sys.path.append(os.path.relpath("../../Mapping/grid_map_lib/"))
+sys.path.append(os.path.relpath("../grid_map_lib/"))
 try:
     from grid_map_lib import GridMap
 except ImportError:
@@ -145,16 +148,16 @@ def convert_grid_coordinate(ox, oy, sweep_vec, sweep_start_position):
     tx = [ix - sweep_start_position[0] for ix in ox]
     ty = [iy - sweep_start_position[1] for iy in oy]
     th = math.atan2(sweep_vec[1], sweep_vec[0])
-    rot = Rot.from_euler('z', th).as_matrix()[0:2, 0:2]
-    converted_xy = np.stack([tx, ty]).T #@ rot
+    rot = Rot.from_euler('z', th).as_dcm()[0:2, 0:2]
+    converted_xy = np.stack([tx, ty]).T @ rot
 
     return converted_xy[:, 0], converted_xy[:, 1]
 
 
 def convert_global_coordinate(x, y, sweep_vec, sweep_start_position):
     th = math.atan2(sweep_vec[1], sweep_vec[0])
-    rot = Rot.from_euler('z', -th).as_matrix()[0:2, 0:2]
-    converted_xy = np.stack([x, y]).T #@ rot
+    rot = Rot.from_euler('z', -th).as_dcm()[0:2, 0:2]
+    converted_xy = np.stack([x, y]).T @ rot
     rx = [ix + sweep_start_position[0] for ix in converted_xy[:, 0]]
     ry = [iy + sweep_start_position[1] for iy in converted_xy[:, 1]]
     return rx, ry
@@ -189,7 +192,7 @@ def setup_grid_map(ox, oy, resolution, sweep_direction, offset_grid=10):
     center_y = (np.max(oy) + np.min(oy)) / 2.0
 
     grid_map = GridMap(width, height, resolution, center_x, center_y)
-    grid_map.print_grid_map_info()
+    # grid_map.print_grid_map_info()
     grid_map.set_value_from_polygon(ox, oy, 1.0, inside=False)
     grid_map.expand_grid()
 
@@ -246,7 +249,7 @@ def sweep_path_search(sweep_searcher, grid_map, grid_search_animation=False):
             grid_map.plot_grid_map(ax=ax)
             plt.pause(1.0)
 
-    grid_map.plot_grid_map()
+    # grid_map.plot_grid_map()
 
     return px, py
 
@@ -293,7 +296,7 @@ def planning_animation(ox, oy, resolution):  # pragma: no cover
             plt.plot(ipx, ipy, "or")
             plt.axis("equal")
             plt.grid(True)
-            plt.pause(0.1)
+            plt.pause(1)
 
     plt.cla()
     plt.plot(ox, oy, "-xb")
@@ -310,11 +313,13 @@ def main():  # pragma: no cover
     ox = [0.0, 20.0, 50.0, 100.0, 130.0, 40.0, 0.0]
     oy = [0.0, -20.0, 0.0, 30.0, 60.0, 80.0, 0.0]
     resolution = 5.0
+    print(type(ox))
+    print(type(oy))
     planning_animation(ox, oy, resolution)
 
-    ox = [0.0, 50.0, 50.0, 0.0, 0.0]
-    oy = [0.0, 0.0, 30.0, 30.0, 0.0]
-    resolution = 1.3
+    ox = [0.0, 2.5, 2.5, 0.0, 0.0]
+    oy = [0.0, 0.0, 1.0, 1.0, 0.0]
+    resolution = .25
     planning_animation(ox, oy, resolution)
 
     ox = [0.0, 20.0, 50.0, 200.0, 130.0, 40.0, 0.0]
