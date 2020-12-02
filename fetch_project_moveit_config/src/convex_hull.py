@@ -24,8 +24,7 @@ class Convex_hull:
         self.IM_poly_pub      = rospy.Publisher('IM_poly'               ,PolygonStamped    ,queue_size=1)
         self.plane_poly_pub   = rospy.Publisher('best_fit_plane_poly'   ,PolygonStamped    ,queue_size=1)
         self.plane_marker_pub = rospy.Publisher('best_fit_plane_marker' ,Marker            ,queue_size=1)
-        self.M_inv_array_pub  = rospy.Publisher('M_inv_array'           ,numpy_msg(Floats) ,queue_size=1)
-        self.coord_array_pub  = rospy.Publisher('coord_array'           ,numpy_msg(Floats) ,queue_size=1)
+        self.data_array_pub   = rospy.Publisher('data_array'            ,numpy_msg(Floats) ,queue_size=1)
 
         # Setup header
         self.header = Header()
@@ -55,6 +54,7 @@ class Convex_hull:
         self.plane_marker.color.b = 0
         # self.plane_marker.pose.orientation.w = -1.0
 
+
         # Intialize X,Y, and Z lists for the IM positions
         self.X = []
         self.Y = []
@@ -77,7 +77,7 @@ class Convex_hull:
         self.M = None
         self.M_inv = None
 
-        # Initialize the 2D sub-plane coodinates.
+        # Initialize the 2D sub-plane coordinates.
         self.coordinates_2D = None
 
         # Initialize the verticies of the convex hull of the IM's
@@ -156,7 +156,6 @@ class Convex_hull:
             self.proj_x.append(self.X[i] - dist*self.u_n[0])
             self.proj_y.append(self.Y[i] - dist*self.u_n[1])
             self.proj_z.append(self.Z[i] - dist*self.u_n[2])
-
         # Begin the transfer_matrix function
         self.transfer_matrix()
 
@@ -241,6 +240,7 @@ class Convex_hull:
             self.coordinates_2D[i] = [reduction[0], reduction[1]]
 
         # Begin Convex_hull on self.coordinates_2D
+
         self.convex_hull()
 
 
@@ -248,9 +248,17 @@ class Convex_hull:
         # Run convex hull function on 2D sub-plane coordinates.
         hull = ConvexHull(self.coordinates_2D)
 
+        hull_coord_2D = []
         for e in hull.vertices:
             self.plane_polygon.polygon.points.append(Point32(self.proj_x[e],self.proj_y[e],self.proj_z[e]))
             self.IM_polygon.polygon.points.append(Point32(self.X[e],self.Y[e],self.Z[e]))
+            hull_coord_2D.append(self.coordinates_2D[e])
+
+        # Begin triangulation of the polygon
+        self.triangulation_polygon()
+
+        # update the coordinates_2D to only consider convex hull coords.
+        self.coordinates_2D = np.array(hull_coord_2D)
 
         # Publish IM_polygon.
         self.IM_poly_pub.publish(self.IM_polygon)
@@ -258,14 +266,11 @@ class Convex_hull:
         # Publish Plane_polygon.
         self.plane_poly_pub.publish(self.plane_polygon)
 
-        # Begin triangulation of the polygon
-        self.triangulation_polygon()
+        # Begin array_publisher function
+        self.array_publisher()
 
         # Begin clear_parameters function
         self.clear_lists()
-
-        # Begin array_publisher function
-        self.array_publisher()
 
 
     def triangulation_polygon(self):
@@ -278,7 +283,7 @@ class Convex_hull:
             for e in triangulation.vertices[j]:
                 triangulation_points.append(Point32(self.proj_x[e], self.proj_y[e], self.proj_z[e]))
 
-        # Assign triangulation_points to plane_marker.points and publish
+        # Assign triangulation_points to plane_marker.points and publish marker
         self.plane_marker.points = triangulation_points
         self.plane_marker_pub.publish(self.plane_marker)
 
@@ -292,9 +297,12 @@ class Convex_hull:
 
 
     def array_publisher(self):
+        # Publish the coordinates of the 2D subplane and Inverse Matrix in a
+        # single numpy array msg.
+        a = np.array(self.M_inv.ravel(), dtype=np.float32)
+        b = np.array(self.coordinates_2D.ravel(), dtype=np.float32)
+        self.data_array_pub.publish(np.concatenate((a,b)))
 
-        self.M_inv_array_pub.publish(self.M_inv.ravel())
-        self.coord_array_pub.publish(self.coordinates_2D.ravel())
 
 
 
