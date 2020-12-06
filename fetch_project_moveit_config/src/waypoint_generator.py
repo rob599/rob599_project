@@ -18,7 +18,8 @@ class Waypoint_generator:
         self.M_inv_array_sub = rospy.Subscriber('data_array',numpy_msg(Floats), self.data_callback, queue_size=1)
 
         # Initialize Publishers
-        self.waypoints_marker_pub = rospy.Publisher('waypoints_marker', Marker, queue_size=1)
+        self.waypoints_pub        = rospy.Publisher('waypoints'       , PoseArray, queue_size=1)
+        self.waypoints_marker_pub = rospy.Publisher('waypoints_marker', Marker   , queue_size=1)
 
         # Setup header
         self.header = Header()
@@ -96,7 +97,7 @@ class Waypoint_generator:
             p = Pose()
             p.position.x = dim_incr[0]
             p.position.y = dim_incr[1]
-            p.position.z = dim_incr[2] + self.offset
+            p.position.z = dim_incr[2]
             p.orientation.x = 0.0
             p.orientation.y = 0.0
             p.orientation.z = 0.0
@@ -105,10 +106,15 @@ class Waypoint_generator:
 
             marker_list.append(Point(p.position.x, p.position.y, p.position.z))
 
+        self.waypoints.poses = poses
+
+        # Publish poses for computeCartesianPath
+        self.waypoints_pub.publish(self.waypoints)
+
+        # Publish markers for waypoints
         self.waypoints_marker.points = marker_list
         self.waypoints_marker_pub.publish(self.waypoints_marker)
 
-        px,py = planning(self.X, self.Y, self.resolution)
 
 
 
