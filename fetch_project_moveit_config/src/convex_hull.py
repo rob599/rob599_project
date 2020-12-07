@@ -83,6 +83,8 @@ class Convex_hull:
         # Initialize the verticies of the convex hull of the IM's
         self.convex_hull_verticies = None
 
+        self.offset = None
+
 
     def best_fit_plane_callback(self,arr_msg):
         # Conditional statement to process arr_msg
@@ -90,6 +92,10 @@ class Convex_hull:
             pass
 
         else:
+            self.X = []
+            self.Y = []
+            self.Z = []
+
             # Sepearately store the components (XYZ) of the IM's
             for i in range(int(len(arr_msg.data)/3)):
                 self.X.append(arr_msg.data[i*3 + 0])
@@ -98,7 +104,7 @@ class Convex_hull:
 
             XYZ = np.array([self.X,self.Y,self.Z])
 
-            # Begin plane fit computation. Reference:https://stackoverflow.com/questions/12299540/
+            # Begin plane fit computation. Reference: https://stackoverflow.com/questions/12299540/
             tmp_A = []
             tmp_b = []
             for i in range(len(self.X)):
@@ -112,12 +118,25 @@ class Convex_hull:
             # Equation: fit[0]*x + fit[1]*y + fit[2] = z
             # assign a,b, and c values by rearranging equation.
             # Rearranged Eq. : (-fit[0]/fit[2])*x + (-fit[1]/fit[2])*y + (1/fit[2])*z = 1
-            self.a = float(-fit[0]/fit[2])
-            self.b = float(-fit[1]/fit[2])
-            self.c = float(1/fit[2])
+            self.a = float(-fit[0]/fit[2])/1
+            self.b = float(-fit[1]/fit[2])/1
+            self.c = float(1/fit[2])/1
+
             #print("%f x + %f y + %f = z" % (fit[0], fit[1], fit[2]))
             #print("Normal vector: < {0}, {1}, {2}> ".format(self.a,self.b,self.c))
 
+            self.plane_offset()
+            self.plane_offset(offset=True)
+
+    def plane_offset(self,offset=False):
+        if offset == True:
+            self.offset = True
+            self.a = self.a/1.3
+            self.b = self.b/1.3
+            self.c = self.c/1.3
+            self.projection_on_plane()
+        else:
+            self.offset = False
             self.projection_on_plane()
 
 
@@ -240,7 +259,6 @@ class Convex_hull:
             self.coordinates_2D[i] = [reduction[0], reduction[1]]
 
         # Begin Convex_hull on self.coordinates_2D
-
         self.convex_hull()
 
 
@@ -254,23 +272,29 @@ class Convex_hull:
             self.IM_polygon.polygon.points.append(Point32(self.X[e],self.Y[e],self.Z[e]))
             hull_coord_2D.append(self.coordinates_2D[e])
 
-        # Begin triangulation of the polygon
-        self.triangulation_polygon()
 
-        # update the coordinates_2D to only consider convex hull coords.
-        self.coordinates_2D = np.array(hull_coord_2D)
+        if self.offset == True:
+            # update the coordinates_2D to only consider convex hull coords.
+            self.coordinates_2D = np.array(hull_coord_2D)
 
-        # Publish IM_polygon.
-        self.IM_poly_pub.publish(self.IM_polygon)
+            # Begin array_publisher function
+            self.array_publisher()
 
-        # Publish Plane_polygon.
-        self.plane_poly_pub.publish(self.plane_polygon)
+            # Begin clear_parameters function
+            self.clear_lists()
 
-        # Begin array_publisher function
-        self.array_publisher()
+        else:
+            # Begin triangulation of the polygon
+            self.triangulation_polygon()
 
-        # Begin clear_parameters function
-        self.clear_lists()
+            # Publish IM_polygon.
+            self.IM_poly_pub.publish(self.IM_polygon)
+
+            # Publish Plane_polygon.
+            self.plane_poly_pub.publish(self.plane_polygon)
+
+            # Begin clear_parameters function
+            self.clear_lists()
 
 
     def triangulation_polygon(self):
@@ -289,9 +313,7 @@ class Convex_hull:
 
 
     def clear_lists(self):
-        # wipe the previous data from lists
-        del self.X[:],self.Y[:],self.Z[:]
-        del self.proj_x[:],self.proj_y[:],self.proj_z[:]
+        # Clear the polygon points for next update.
         del self.plane_polygon.polygon.points[:]
         del self.IM_polygon.polygon.points[:]
 
