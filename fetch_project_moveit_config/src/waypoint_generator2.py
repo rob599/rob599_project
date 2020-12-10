@@ -37,9 +37,11 @@ class Waypoint_generator:
         self.sub_plane_polygon = PolygonStamped()
         self.sub_plane_polygon.header = self.header
 
+        # Setup PoseArray for the waypoints.
         self.waypoints = PoseArray()
         self.waypoints.header = self.header
 
+        # Setup Marker for the waypoints. This will be visualized in rviz
         self.waypoints_marker = Marker()
         self.waypoints_marker.header = self.header
         self.waypoints_marker.type = Marker.LINE_STRIP
@@ -52,14 +54,11 @@ class Waypoint_generator:
         self.waypoints_marker.color.g = 0
         self.waypoints_marker.color.b = 1.0
 
+        # Intialize the inverse tranform matrix.
         self.M_inv = None
 
-        self.X = None
-        self.Y = None
-
-        self.resolution = .05
-
-        self.offset = .3
+        # Set the offset
+        # self.offset = .3
 
 
     def data_callback(self, data_msg):
@@ -69,9 +68,7 @@ class Waypoint_generator:
 
         # Set Inverse transfer Matrix (M_inv) to equal an empty matrix.
         self.M_inv = np.empty(shape=[4,4])
-        self.X = []
-        self.Y = []
-
+        poly = []
         for i in range(4):
             self.M_inv[i][0] = M_inv_arr[i*4 + 0]
             self.M_inv[i][1] = M_inv_arr[i*4 + 1]
@@ -79,7 +76,9 @@ class Waypoint_generator:
             self.M_inv[i][3] = M_inv_arr[i*4 + 3]
 
         for i in range(coord_2D_arr_len):
-            self.sub_plane_polygon.polygon.points.append(Point32(coord_2D_arr[2*i + 0], coord_2D_arr[2*i + 1], 0))
+            poly.append(Point32(coord_2D_arr[2*i + 0], coord_2D_arr[2*i + 1], 0))
+
+        self.sub_plane_polygon.polygon.points = poly
 
         self.assign_goal()
 
@@ -99,7 +98,8 @@ class Waypoint_generator:
 
         goal = PlanMowingPathGoal(property=poly,robot_position=start_pose)
         self.coverage_client.send_goal(goal, done_cb=self.callback_done)
-        # dimension_increase
+        self.coverage_client.wait_for_result()
+
 
     def callback_done(self, status, result):
 
@@ -114,7 +114,7 @@ class Waypoint_generator:
             p = Pose()
             p.position.x = dim_incr[0]
             p.position.y = dim_incr[1]
-            p.position.z = dim_incr[2] + self.offset
+            p.position.z = dim_incr[2]
             p.orientation.x = 0.0
             p.orientation.y = 0.0
             p.orientation.z = 0.0
