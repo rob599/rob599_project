@@ -14,12 +14,12 @@ from enum import IntEnum
 import matplotlib.pyplot as plt
 import numpy as np
 from scipy.spatial.transform import Rotation as Rot
+from grid_map_lib import GridMap
 
-sys.path.append(os.path.relpath("../grid_map_lib/"))
-try:
-    from grid_map_lib import GridMap
-except ImportError:
-    raise
+# sys.path.append(os.path.relpath("../grid_map_lib/"))
+# try:
+# except ImportError:
+#     raise
 
 do_animation = True
 
@@ -234,7 +234,7 @@ def sweep_path_search(sweep_searcher, grid_map, grid_search_animation=False):
 
         if sweep_searcher.is_search_done(grid_map) or (
                 c_x_index is None or c_y_index is None):
-            print("Done")
+            # print("Done")
             break
 
         x, y = grid_map.calc_grid_central_xy_position_from_xy_index(
@@ -275,7 +275,7 @@ def planning(ox, oy, resolution,
     rx, ry = convert_global_coordinate(px, py, sweep_vec,
                                        sweep_start_position)
 
-    print("Path length:", len(rx))
+    # print("Path length:", len(rx))
 
     return rx, ry
 
