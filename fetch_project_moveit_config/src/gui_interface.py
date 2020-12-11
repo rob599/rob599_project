@@ -20,7 +20,7 @@ class Interface(QMainWindow):
     def initUI(self):
         global app
         self.quit_button = QPushButton('Quit')
-        self.waypoints   = QPushButton('Generate Waypoint')
+        self.planning   = QPushButton('Plan Path')
         self.execute     = QPushButton('Execute Path')
         self.init_pose   = QPushButton('Initial Pose')
         self.tuck_pose   = QPushButton('Tuck Arm')
@@ -31,7 +31,7 @@ class Interface(QMainWindow):
 
         # A layout
         layout = QHBoxLayout()
-        layout.addWidget(self.waypoints)
+        layout.addWidget(self.planning)
         layout.addWidget(self.execute)
         layout.addWidget(self.init_pose)
         layout.addWidget(self.tuck_pose)
@@ -39,7 +39,7 @@ class Interface(QMainWindow):
         widget.setLayout(layout)
 
         self.quit_button.clicked.connect(app.exit)
-        self.waypoints.clicked.connect(self.publish_command)
+        self.planning.clicked.connect(self.publish_command)
         self.execute.clicked.connect(self.publish_command_b)
         self.init_pose.clicked.connect(self.publish_command_c)
         self.tuck_pose.clicked.connect(self.publish_command_d)
