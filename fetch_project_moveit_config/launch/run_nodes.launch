@@ -4,5 +4,8 @@
   <node pkg="fetch_project_moveit_config" type="convex_hull.py"   name="convex_hull"  output="screen"/>
   <node pkg="fetch_project_moveit_config" type="create_interactive_markers.py"  name="create_interactive_markers"  output="screen"/>
   <node pkg="fetch_project_moveit_config" type="waypoint_generator.py"  name="waypoint_generator"  output="screen"/>
+  <node pkg="fetch_project_moveit_config" type="gui_interface.py"  name="gui_interface"  output="screen"/>
+  <node pkg="fetch_project_moveit_config" type="execute_path.py"  name="execute_path"  output="screen"/>
+
 
 </launch>
