@@ -1,0 +1,5 @@
+#inputs
+float64 velocity
+---
+#outputs
+bool vel_set
