@@ -12,6 +12,7 @@ from moveit_msgs.msg import MoveItErrorCodes, PlanningScene
 from moveit_python import MoveGroupInterface, PlanningSceneInterface
 from std_msgs.msg import String, Int16
 from geometry_msgs.msg import PoseStamped, Pose, Point, Quaternion, PoseArray
+from fetch_project_moveit_config.srv import Velocities, VelocitiesResponse
 
 class ExecutePath(object):
 
@@ -19,7 +20,6 @@ class ExecutePath(object):
     super(ExecutePath, self).__init__()
     self.gui_input_sub = rospy.Subscriber('gui_input', String, self.interface_callback)
     self.waypoints_sub = rospy.Subscriber('waypoints', PoseArray, self.waypoint_callback)
-
     # First initialize `moveit_commander`
     moveit_commander.roscpp_initialize(sys.argv)
 
@@ -45,7 +45,10 @@ class ExecutePath(object):
     self.planning_frame = self.group.get_planning_frame()
 
     self.path_to_goal=FollowTrajectoryClient()
-
+    #Initialise ros service to change velocity of arm 
+    self.service = rospy.Service('service_vel', Velocities, self.callback_srv)
+    rospy.loginfo('Made  contact with  velocity server')
+    self.traj_vel = 0.2
 
   def waypoint_callback(self,msg):
       self.waypoints = []
@@ -62,10 +65,10 @@ class ExecutePath(object):
           self.execute_plan()
 
       elif gui_input.data == "2":
-          self.path_to_goal.init_pose()
+          self.path_to_goal.init_pose(self.traj_vel)
 
       elif gui_input.data == "3":
-          self.path_to_goal.tuck_pose()
+          self.path_to_goal.tuck_pose(self.traj_vel)
 
   def plan_cartesian_path(self):
     ## Cartesian Paths
@@ -74,12 +77,18 @@ class ExecutePath(object):
                                        0.1,              # eef_step
                                        0.00)             # jump_threshold
 
-    self.plan = self.group.retime_trajectory(self.robot.get_current_state(),plan,.2)
+    self.plan = self.group.retime_trajectory(self.robot.get_current_state(),plan,self.traj_vel)
     # Note: We are just planning, not asking move_group to actually move the robot yet:
     print("Path has been computed")
 
   def execute_plan(self):
-    self.group.execute(self.plan, wait=True)
+ #     print ("WAYPOINTS ARE:", len(self.waypoints), self.waypoints)
+      self.group.execute(self.plan, wait=True)
+
+  def callback_srv(self, request):
+      self.traj_vel = request.velocity
+      rospy.loginfo('Changed  arm Velocity  to:{0}'.format(self.traj_vel))
+      return VelocitiesResponse(True)
 
 
 class FollowTrajectoryClient(object):
@@ -91,7 +100,7 @@ class FollowTrajectoryClient(object):
 
         self.scene = PlanningSceneInterface("base_link")
         self.scene.addBox("keepout", 0.2, 0.5, 0.05, 0.15, 0.0, 0.375)
-    def tuck_pose(self):
+    def tuck_pose(self, vel):
 
 
         # Padding does not work (especially for self collisions)
@@ -105,13 +114,13 @@ class FollowTrajectoryClient(object):
             result = self.client.moveToJointPosition(joints,
                                                      pose,
                                                      tolerance = 0.02,
-                                                     max_velocity_scaling_factor=0.2)
+                                                     max_velocity_scaling_factor=vel)
             if result and result.error_code.val == MoveItErrorCodes.SUCCESS:
-                scene.removeCollisionObject("keepout")
+                self.scene.removeCollisionObject("keepout")
                 rospy.loginfo("done")
                 return
 
-    def init_pose(self):
+    def init_pose(self, vel):
 
         # Padding does not work (especially for self collisions)
         # So we are adding a box above the base of the robot
@@ -126,7 +135,7 @@ class FollowTrajectoryClient(object):
             result = self.client.moveToJointPosition(joints,
                                                      pose,
                                                      tolerance = 0.02,
-                                                     max_velocity_scaling_factor=0.2)
+                                                     max_velocity_scaling_factor=vel)
             if result and result.error_code.val == MoveItErrorCodes.SUCCESS:
                 scene.removeCollisionObject("keepout")
                 rospy.loginfo("done")
