@@ -3,6 +3,7 @@
 # Import what we need
 import rospy
 import math
+import random
 import numpy as np
 
 from visualization_msgs.msg import Marker
@@ -18,8 +19,9 @@ class Waypoint_generator:
         self.M_inv_array_sub = rospy.Subscriber('data_array',numpy_msg(Floats), self.data_callback, queue_size=1)
 
         # Initialize Publishers
-        self.waypoints_pub        = rospy.Publisher('waypoints'       , PoseArray, queue_size=1)
-        self.waypoints_marker_pub = rospy.Publisher('waypoints_marker', Marker   , queue_size=1)
+        self.waypoints_pub        = rospy.Publisher('waypoints'       , PoseArray        , queue_size=1)
+        self.waypoints_marker_pub = rospy.Publisher('waypoints_marker', Marker           , queue_size=1)
+        self.waypoints_missed     = rospy.Publisher('waypoints_missed', numpy_msg(Floats), queue_size=1)
 
         # Setup header
         self.header = Header()
@@ -89,10 +91,12 @@ class Waypoint_generator:
         # dimension_increase
         poses = []
         marker_list = []
+        pose_arr = np.empty(shape=[len(px),2])
 
         for i in range(len(px)):
             arr_2D = np.array([px[i], py[i], 0, 1])
             dim_incr = np.matmul(self.M_inv, arr_2D)
+            pose_arr[i] = [px[i], py[i]]
 
             p = Pose()
             p.position.x = dim_incr[0]
@@ -115,7 +119,19 @@ class Waypoint_generator:
         self.waypoints_marker.points = marker_list
         self.waypoints_marker_pub.publish(self.waypoints_marker)
 
+        missed_points = np.empty(shape=[3,2])
 
+        for i in range(3):
+            e = random.randint(0,len(pose_arr)-1)
+            missed_points[i] = pose_arr[e]
+
+
+        # Publish the "missed" points for optimization node
+        a = np.array(self.M_inv.ravel(), dtype=np.float32)
+        b = np.array(missed_points.ravel(), dtype=np.float32)
+        self.waypoints_missed.publish(np.array(pose_arr.ravel(), dtype=np.float32))
+
+        # self.waypoints_missed.publish(np.array(missed_points.ravel(), dtype=np.float32))
 
 
 
