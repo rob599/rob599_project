@@ -51,7 +51,6 @@ class Waypoint_generator:
         self.waypoints_marker.color.g = 0
         self.waypoints_marker.color.b = 1.0
 
-        self.offset = .3
 
 
     def data_callback(self, data_msg):
