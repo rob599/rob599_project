@@ -90,11 +90,6 @@ class ExecutePath(object):
       rospy.loginfo('Changed  arm Velocity  to:{0}'.format(self.traj_vel))
       return VelocitiesResponse(True)
 
-  def callback_srv(self, request):
-      self.traj_vel = request.velocity
-      rospy.loginfo('Changed  arm Velocity  to:{0}'.format(self.traj_vel))
-      return VelocitiesResponse(True)
-
 
 class FollowTrajectoryClient(object):
 
