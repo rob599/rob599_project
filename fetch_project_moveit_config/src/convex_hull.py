@@ -13,7 +13,7 @@ from scipy.spatial import ConvexHull, Delaunay
 from sympy import solve, Poly, Eq, Function, exp, Symbol
 from rospy.numpy_msg import numpy_msg
 from rospy_tutorials.msg import Floats
-
+from fetch_project_moveit_config.srv  import HeightOffset, HeightOffsetResponse
 
 class Convex_hull:
     def __init__(self):
@@ -84,7 +84,11 @@ class Convex_hull:
         self.convex_hull_verticies = None
 
         self.offset = None
-
+        #Initialize  height offset value
+        self.offset_val = 0.3
+        #Initialize service to set new height offset
+        self.service = rospy.Service('service_height', HeightOffset, self.callback_srv)
+        rospy.loginfo('Made contact with height offset server')
 
     def best_fit_plane_callback(self,arr_msg):
         # Conditional statement to process arr_msg
@@ -131,9 +135,10 @@ class Convex_hull:
     def plane_offset(self,offset=False):
         if offset == True:
             self.offset = True
-            self.a = self.a/1.3
-            self.b = self.b/1.3
-            self.c = self.c/1.3
+            new_height = 1+self.offset_val
+            self.a = self.a/new_height
+            self.b = self.b/new_height
+            self.c = self.c/new_height
             self.projection_on_plane()
         else:
             self.offset = False
@@ -325,6 +330,10 @@ class Convex_hull:
         b = np.array(self.coordinates_2D.ravel(), dtype=np.float32)
         self.data_array_pub.publish(np.concatenate((a,b)))
 
+    def callback_srv(self, request):
+        self.offset_val = request.h_offset
+        rospy.loginfo('Changed height offset to:{0}'.format(self.offset_val))
+        return HeightOffsetResponse(True)
 
 
 
