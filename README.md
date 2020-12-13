@@ -22,6 +22,7 @@ You also need to pip3 install:
 * sympy
 * planar
 * trimesh
+* mlrose
 
 ### Build
 Add the package to your src file in your workspace.
