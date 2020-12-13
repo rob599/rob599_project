@@ -20,10 +20,15 @@ class WaypointTransform():
     def waypoint_callback(self, msg):
         cloud = PointCloud()
         cloud.header = msg.header
+
         for i in range(len(msg.poses)):
             cloud.points.append(Point32(msg.poses[i].position.x, msg.poses[i].position.y, msg.poses[i].position.z))
 
-        cloud = self.listener.transformPointCloud(self.frame, cloud)
+        try:
+            cloud = self.listener.transformPointCloud(self.frame, cloud)
+        except (tf.LookupException, tf.ConnectivityException, tf.ExtrapolationException):
+            return
+
         self.pub.publish(cloud)
 
 if __name__=="__main__":
