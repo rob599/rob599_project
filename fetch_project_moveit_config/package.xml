@@ -63,7 +63,6 @@
 
   <!-- The export tag contains other, unspecified, tags -->
   <export>
-    <gazebo_ros gazebo_model_path="${prefix}/fetch_project_moveit_config/worlds/models"/>
-    <gazebo_ros gazebo_media_path="${prefix}/fetch_project_moveit_config/worlds/models"/>
+
   </export>
 </package>
