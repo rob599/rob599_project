@@ -134,10 +134,10 @@ class Waypoint_generator:
         self.waypoints_marker_pub.publish(self.waypoints_marker)
 
         # Create an array for three missed points
-        missed_points = np.empty(shape=[3,2])
+        missed_points = np.empty(shape=[4,2])
 
         # For loop to randomly select points for the missed points array
-        for i in range(3):
+        for i in range(4):
             e = random.randint(0,len(pose_arr)-1)
             missed_points[i] = pose_arr[e]
 
