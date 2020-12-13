@@ -65,6 +65,7 @@ find_package(Eigen3 REQUIRED)
    FILES
    Velocities.srv
    HeightOffset.srv
+   CircularPath.srv
  )
 
 ## Generate actions in the 'action' folder

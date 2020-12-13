@@ -1,0 +1,5 @@
+#inputs
+bool start_circle
+---
+#outputs
+bool end_circle
