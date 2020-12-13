@@ -21,7 +21,7 @@ class Optimizer:
         self.waypoints_missed_sub = rospy.Subscriber('missed_data',numpy_msg(Floats), self.data_callback, queue_size=1)
 
         # Initialize Publishers
-        self.waypoints_pub = rospy.Publisher('waypoints_missed', PoseArray, queue_size=1)
+        self.waypoints_missed_pub = rospy.Publisher('waypoints_missed', PoseArray, queue_size=1)
 
         # Setup header
         self.header = Header()
@@ -96,7 +96,12 @@ class Optimizer:
             p.orientation.w = 1.0
             poses.append(p)
 
-        print(poses)
+        # Publish PoseArray of missed poses
+        self.waypoints_missed.poses = poses
+        self.waypoints_missed_pub.publish(self.waypoints_missed)
+
+
+
 if __name__=="__main__":
     # Initialize the node
     rospy.init_node('optimizer')
