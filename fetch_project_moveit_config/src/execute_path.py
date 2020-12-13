@@ -56,7 +56,7 @@ class ExecutePath(object):
 
     # Set path_to_goal to the FollowTrajectoryClient Class
     self.path_to_goal=FollowTrajectoryClient()
-    #Initialise ros service to change velocity of arm 
+    #Initialise ros service to change velocity of arm
     self.service = rospy.Service('service_vel', Velocities, self.callback_srv)
     rospy.loginfo('Made  contact with  velocity server')
     self.traj_vel = 0.8
@@ -79,10 +79,10 @@ class ExecutePath(object):
   def interface_callback(self,gui_input):
 
       if gui_input.data == "0":
-          self.plan_cartesian_path()
+          self.plan = self.plan_cartesian_path(self.waypoints)
 
       elif gui_input.data == "1":
-          self.execute_plan()
+          self.execute_plan(self.plan)
 
       elif gui_input.data == "2":
           self.path_to_goal.init_pose(self.traj_vel)
@@ -90,20 +90,21 @@ class ExecutePath(object):
       elif gui_input.data == "3":
           self.path_to_goal.tuck_pose(self.traj_vel)
 
-  def plan_cartesian_path(self):
+  def plan_cartesian_path(self, waypoints):
     ## Cartesian Paths
     (plan, fraction) = self.group.compute_cartesian_path(
-                                       self.waypoints,   # waypoints to follow
+                                       waypoints,   # waypoints to follow
                                        0.1,              # eef_step
                                        0.00)             # jump_threshold
 
-    self.plan = self.group.retime_trajectory(self.robot.get_current_state(),plan,self.traj_vel)
+    plan = self.group.retime_trajectory(self.robot.get_current_state(),plan,self.traj_vel)
     # Note: We are just planning, not asking move_group to actually move the robot yet:
     print("Path has been computed")
+    return plan
 
-  def execute_plan(self):
+  def execute_plan(self, plan):
  #     print ("WAYPOINTS ARE:", len(self.waypoints), self.waypoints)
-      self.group.execute(self.plan, wait=True)
+      self.group.execute(plan, wait=True)
 
   def callback_srv(self, request):
       self.traj_vel = request.velocity
@@ -113,64 +114,77 @@ class ExecutePath(object):
   def circle_callback_srv(self, request):
       self.start_path = request.start_circle
       if (self.start_path):
-          circular_waypoints = self.compute_circular_waypoints()
-          circular_plan = self.plan_circular_path(circular_waypoints)
-          self.execute_circular_path(circular_plan)
-          rospy.loginfo('Circular motion completed')
+          for i in range (0, len(self.waypoints_missed)):
+              self.move_to_point(i)
+              self.perform_circular_motion()
           return CircularPathResponse(True)
-  
+      else:
+          return CircularPathResponse(False)
+
+  def move_to_point(self, i):
+      waypoints = []
+      waypoints.append(self.waypoints_missed[i])
+      missed_plan = self.plan_cartesian_path(waypoints)
+      self.execute_plan(missed_plan)
+
+  def perform_circular_motion(self):
+      circular_waypoints = self.compute_circular_waypoints()
+      circular_plan = self.plan_circular_path(circular_waypoints)
+      self.execute_circular_path(circular_plan)
+      rospy.loginfo('Circular motion completed')
+
   def compute_circular_waypoints(self):
     circular_waypoints =  []
     #self.path_radius = 0.01
-    increments = np.pi/4 
+    increments = np.pi/4
     curr_pose = self.group.get_current_pose().pose
     print ("Current  pose:", curr_pose)
     angle= np.pi/4
     circular_waypoints.append(curr_pose)
     point = curr_pose
-    
+
     point.orientation.x =  0.0
     point.orientation.y =  -0.422
     point.orientation.z =  0.0
     point.orientation.w =  0.906
     circular_waypoints.append(point)
-    
+
   #  point.orientation.x =  0.35
   #  point.orientation.y =  0.35
   #  point.orientation.z =  -0.61
   #  point.orientation.w =  0.61
   #  circular_waypoints.append(point)
-   # 
+   #
    # point.orientation.x =  0.35
    # point.orientation.y =  0.61
    # point.orientation.z =  -0.61
    # point.orientation.w =  0.35
    # circular_waypoints.append(point)
-   # 
+   #
    # point.orientation.x =  0.61
    # point.orientation.y =  0.61
    # point.orientation.z =  -0.35
    # point.orientation.w =  0.35
    # circular_waypoints.append(point)
-   # 
+   #
    # point.orientation.x =  0.61
    # point.orientation.y =  0.35
    # point.orientation.z =  -0.35
    # point.orientation.w =  0.61
    # circular_waypoints.append(point)
-   # 
+   #
    # point.orientation.x =  0.35
    # point.orientation.y =  0.35
    # point.orientation.z =  -0.61
    # point.orientation.w =  0.61
    # circular_waypoints.append(point)
-   # 
+   #
    # point.orientation.x =  0.35
    # point.orientation.y =  0.61
    # point.orientation.z =  -0.61
    # point.orientation.w =  0.35
    # circular_waypoints.append(point)
-   # 
+   #
    # point.orientation.x =  0.61
    # point.orientation.y =  0.61
    # point.orientation.z =  -0.35
@@ -190,7 +204,7 @@ class ExecutePath(object):
     #circular_waypoints.append(curr_pose)
 
 
-    
+
    # for i in range(0, int(2*np.pi/increments)):
    #     point = curr_pose
    #     point.position.x = self.path_radius*np.cos(angle)
@@ -201,7 +215,7 @@ class ExecutePath(object):
    # circular_waypoints.append(curr_pose)
     #circular_waypoints = self.waypoints
     return circular_waypoints
-  
+
   def plan_circular_path(self, circular_waypoints):
     ## Cartesian Paths
     (plan, fraction) = self.group.compute_cartesian_path(
@@ -213,7 +227,7 @@ class ExecutePath(object):
     # Note: We are just planning, not asking move_group to actually move the robot yet:
     print("Path has been computed")
     return circular_plan
-  
+
   def execute_circular_path(self, circular_plan):
  #     print ("WAYPOINTS ARE:", len(self.waypoints), self.waypoints)
     self.group.execute(circular_plan, wait=True)
