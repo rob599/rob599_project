@@ -21,6 +21,7 @@ You also need to pip3 install:
 * scipy
 * sympy
 * planar
+* trimesh
 
 ### Build
 Add the package to your src file in your workspace.
@@ -31,12 +32,18 @@ cd ~/catkin_ws/
 catkin_make
 source devel/setup.bash
 ```
+Navigate to ~/catkin_ws/src/rob599_project
+```
+mv block/ ~/.gazebo/models
+```
+This adds the necessary gazebo models so that they can be imported
+
 
 ### Get started
 Run launch files to get things started.
 
 ```
-roslaunch fetch_project_moveit_config fetch_world.launch
+roslaunch fetch_project_moveit_config fetch_world.launch or roslaunch fetch_project_moveit_config fetch_world_collision.launch
 roslaunch fetch_project_moveit_config disinfectant_project.launch
 roslaunch fetch_project_moveit_config run_nodes.launch
 rosrun teleop_twist_keyboard teleop_twist_keyboard.py
