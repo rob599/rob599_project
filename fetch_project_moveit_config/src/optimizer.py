@@ -68,12 +68,12 @@ class Optimizer:
         # Initialize fitness function object using self.coords_list
         fitness_coords = mlrose.TravellingSales(coords = self.coords_list)
 
-        problem_fit = mlrose.TSPOpt(length = 3,
+        problem_fit = mlrose.TSPOpt(length = 4,
                                     fitness_fn = fitness_coords,
                                     maximize=False)
 
         # Solve problem using the genetic algorithm
-        best_state, best_fitness = mlrose.genetic_alg(problem_fit, random_state = 2)
+        best_state, best_fitness = mlrose.genetic_alg(problem_fit, random_state = 3)
 
         print('The best state found is: ', best_state)
         print('The fitness at the best state is: ', best_fitness)
