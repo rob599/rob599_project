@@ -23,7 +23,13 @@ You also need to pip3 install:
 * planar
 * trimesh
 * mlrose
+* pyrender
 
+To get the last python dependency, Rtree:
+```
+sudo apt install libspatialindex-dev
+pip3 install Rtree
+```
 ### Build
 Add the package to your src file in your workspace.
 
