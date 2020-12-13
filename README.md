@@ -21,6 +21,7 @@ You also need to pip3 install:
 * scipy
 * sympy
 * planar
+* trimesh
 
 ### Build
 Add the package to your src file in your workspace.
