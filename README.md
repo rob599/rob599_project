@@ -34,7 +34,7 @@ source devel/setup.bash
 ```
 Navigate to ~/catkin_ws/src/rob599_project
 ```
-mv block ~/.gazebo/models
+mv block/ ~/.gazebo/models
 ```
 This adds the necessary gazebo models so that they can be imported
 
