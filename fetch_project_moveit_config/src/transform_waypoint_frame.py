@@ -17,6 +17,7 @@ class WaypointTransform():
         self.listener = tf.TransformListener()
         self.frame = "/map"
 
+    #transforms pose array into point cloud and transforms into map coordinates
     def waypoint_callback(self, msg):
         cloud = PointCloud()
         cloud.header = msg.header

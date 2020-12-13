@@ -26,6 +26,7 @@ class CollisionWarning():
         self.sdf = sdfield_generator.SDF_Generator(dir_path, 32, .05)
         distance_array, sdf_origin, sdf_spacing, sdf_resolution = self.sdf.get_sdf_array()
 
+    #gets points from published waypoints and checks them agains the sdf
     def waypoint_callback(self, msg):
         for i in range(len(msg.points)-1):
             x = np.linspace(msg.points[i].x, msg.points[i+1].x, 10)
@@ -49,6 +50,7 @@ class CollisionWarning():
             
         rospy.loginfo("CURRENT PATH IS NOT IN COLLISION")
 
+    #gets model world position in gazebo
     def model_callback(self, msg):
         for i in range(len(msg.name)):
             if msg.name[i] == "block" and self.get_new_pose == True:
