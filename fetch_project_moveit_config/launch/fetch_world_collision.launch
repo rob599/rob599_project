@@ -19,7 +19,7 @@
 	 <arg name="paused" value="false"/>
 	 <arg name="use_sim_time" value="true"/>
 	 <arg name="headless" value="$(arg headless)"/>
-	 <arg name="world_name" value="$(find fetch_project_moveit_config)/worlds/short_table.world"/>
+	 <arg name="world_name" value="$(find fetch_project_moveit_config)/worlds/short_table_collision.world"/>
  </include>
 
  <!-- Oh, you wanted a robot? -->

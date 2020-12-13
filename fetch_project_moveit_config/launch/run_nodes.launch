@@ -6,6 +6,8 @@
   <node pkg="fetch_project_moveit_config" type="waypoint_generator.py"  name="waypoint_generator"  output="screen"/>
   <node pkg="fetch_project_moveit_config" type="gui_interface.py"  name="gui_interface"  output="screen"/>
   <node pkg="fetch_project_moveit_config" type="execute_path.py"  name="execute_path"  output="screen"/>
+  <node pkg="fetch_project_moveit_config" type="collision_warning.py"  name="collision_warning"  output="screen"/>
+  <node pkg="fetch_project_moveit_config" type="transform_waypoint_frame.py"  name="transform_waypoint_frame"/>
 
 
 </launch>
