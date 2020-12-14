@@ -56,3 +56,26 @@ roslaunch fetch_project_moveit_config run_nodes.launch
 rosrun teleop_twist_keyboard teleop_twist_keyboard.py
 ```
 Click on the publish point feature and then click on one of the cubes in the octomap. This should populate an interactive marker at the location of the cube.
+
+Once you have atleast three (four preferred) markers up,  you will be able  to see a plane marked by these points and also a lawnmower path defined by this plane, at a height offset. 
+
+### Using the GUI
+* Select "Plan Path" when you're ready with the lawnmower path and there are no collision error messages
+* Select "Execute Path" if the planned path succeeds without any errors
+* Select "Initial Pose" to take the arm to the initial position.
+* Select "Tuck Arm" to take the arm back to its home position.
+
+### Executing the optimizer code
+Once you have  executed the waypoints, this service call will go back and spray the points that  were missed  in the path
+```
+rosrun fetch_project_moveit_config circular_path_service_client.py
+```
+### Changing the height offset of  waypoints from the plane:
+```
+rosrun fetch_project_moveit_config h_offset_service_client.py
+```
+### Changing the velocity of the arm
+```
+rosrun fetch_project_moveit_config vel_service_client.py
+```
+Give it a value between 0 and 1 (as a ratio of max vel)
