@@ -24,6 +24,7 @@ You also need to pip3 install:
 * trimesh
 * mlrose
 * pyrender
+* Rtree
 
 To get the last python dependency, Rtree:
 ```
