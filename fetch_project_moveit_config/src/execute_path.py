@@ -60,6 +60,7 @@ class ExecutePath(object):
     self.service = rospy.Service('service_vel', Velocities, self.callback_srv)
     rospy.loginfo('Made  contact with  velocity server')
     self.traj_vel = 0.8
+    #Initialise ros service to run optimized path on missed waypoints 
     self.service_cpath = rospy.Service('service_circle', CircularPath, self.circle_callback_srv)
     rospy.loginfo('Made  contact with circular  path server')
     #the direction to rotate, when performing  circular motion
@@ -113,6 +114,7 @@ class ExecutePath(object):
       return VelocitiesResponse(True)
 
   def circle_callback_srv(self, request):
+    #Execute optimized path with circular motion
       self.start_path = request.start_circle
       if (self.start_path):
           for i in range (0, len(self.waypoints_missed)):
@@ -123,12 +125,14 @@ class ExecutePath(object):
           return CircularPathResponse(False)
 
   def move_to_point(self, i):
+    #execute missed waypoint
       waypoints = []
       waypoints.append(self.waypoints_missed[i])
       missed_plan = self.plan_cartesian_path(waypoints)
       self.execute_plan(missed_plan)
 
   def perform_circular_motion(self):
+      #create and execute a circular path around the point
       self.curr_pose = self.group.get_current_pose().pose
       
       for i in range(0, self.num_of_dir):        
@@ -138,11 +142,13 @@ class ExecutePath(object):
       rospy.loginfo('Circular motion completed')
 
   def compute_circular_waypoints(self, i):
+    #We  want to rotate the end effector  around the current point
+    #generating waypoints for the circular motion
     circular_waypoints =  []    
     print ("Current  pose:", i)
     point = self.curr_pose
     point.orientation.w =  0.9961947
-    turn_angle = 0.017452#0.0436194#0.0871557
+    turn_angle = 0.017452
     if (i==0):
       point.orientation.y =  turn_angle
 
@@ -163,71 +169,6 @@ class ExecutePath(object):
 
     circular_waypoints.append(point)
 
-  #  point.orientation.x =  0.35
-  #  point.orientation.y =  0.35
-  #  point.orientation.z =  -0.61
-  #  point.orientation.w =  0.61
-  #  circular_waypoints.append(point)
-   #
-   # point.orientation.x =  0.35
-   # point.orientation.y =  0.61
-   # point.orientation.z =  -0.61
-   # point.orientation.w =  0.35
-   # circular_waypoints.append(point)
-   #
-   # point.orientation.x =  0.61
-   # point.orientation.y =  0.61
-   # point.orientation.z =  -0.35
-   # point.orientation.w =  0.35
-   # circular_waypoints.append(point)
-   #
-   # point.orientation.x =  0.61
-   # point.orientation.y =  0.35
-   # point.orientation.z =  -0.35
-   # point.orientation.w =  0.61
-   # circular_waypoints.append(point)
-   #
-   # point.orientation.x =  0.35
-   # point.orientation.y =  0.35
-   # point.orientation.z =  -0.61
-   # point.orientation.w =  0.61
-   # circular_waypoints.append(point)
-   #
-   # point.orientation.x =  0.35
-   # point.orientation.y =  0.61
-   # point.orientation.z =  -0.61
-   # point.orientation.w =  0.35
-   # circular_waypoints.append(point)
-   #
-   # point.orientation.x =  0.61
-   # point.orientation.y =  0.61
-   # point.orientation.z =  -0.35
-   # point.orientation.w =  0.35
-   # circular_waypoints.append(point)
-   # circular_waypoints.append(curr_pose)
-
-   # for i in range(0, int(2*np.pi/increments)):
-   #     point=  curr_pose
-   #     quat = quaternion_from_euler(0,angle,0)
-   #     point.orientation.x =  quat[0]
-   #     point.orientation.y =  quat[1]
-   #     point.orientation.z =  quat[2]
-   #     point.orientation.w =  quat[3]
-   #     circular_waypoints.append(point)
-   #     angle+=increments
-    #circular_waypoints.append(curr_pose)
-
-
-
-   # for i in range(0, int(2*np.pi/increments)):
-   #     point = curr_pose
-   #     point.position.x = self.path_radius*np.cos(angle)
-   #     point.position.y=self.path_radius*np.sin(angle)
-   #     angle+= increments
-   #     circular_waypoints.append(point)
-
-   # circular_waypoints.append(curr_pose)
-    #circular_waypoints = self.waypoints
     return circular_waypoints
 
   def plan_circular_path(self, circular_waypoints):
