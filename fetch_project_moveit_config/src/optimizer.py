@@ -75,8 +75,8 @@ class Optimizer:
         # Solve problem using the genetic algorithm
         best_state, best_fitness = mlrose.genetic_alg(problem_fit, random_state = 3)
 
-        print('The best state found is: ', best_state)
-        print('The fitness at the best state is: ', best_fitness)
+        # print('The best state found is: ', best_state)
+        # print('The fitness at the best state is: ', best_fitness)
 
 
         # Begin dimension increase for 2D coordinates (px, py)

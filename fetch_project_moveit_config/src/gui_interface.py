@@ -47,16 +47,16 @@ class Interface(QMainWindow):
 
     def publish_command(self):
         self.gui_input_pub.publish("0")
-        print(0)
+        # print(0)
     def publish_command_b(self):
         self.gui_input_pub.publish("1")
-        print(1)
+        # print(1)
     def publish_command_c(self):
         self.gui_input_pub.publish("2")
-        print(2)
+        # print(2)
     def publish_command_d(self):
         self.gui_input_pub.publish("3")
-        print(3)
+        # print(3)
 
 def run():
     rospy.init_node('gui_interface')
