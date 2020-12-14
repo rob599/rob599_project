@@ -49,7 +49,7 @@ class CollisionWarning():
                 distance_from_cube = self.sdf.interpolate_sdf_from_point(transformed_point)   
 
                 #if we are seen to be in collision with the object we throw an error message and return
-                if distance_from_cube < .04 and distance_from_cube != -1:
+                if distance_from_cube < .002 and distance_from_cube != -1:
                     rospy.logerr("YOUR PATH IS CURRENTLY IN COLLISION WITH AN OBJECT, PLEASE ADJUST THE MARKERS")
                     return
                     
