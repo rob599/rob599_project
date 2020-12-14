@@ -62,7 +62,8 @@ class ExecutePath(object):
     self.traj_vel = 0.8
     self.service_cpath = rospy.Service('service_circle', CircularPath, self.circle_callback_srv)
     rospy.loginfo('Made  contact with circular  path server')
-
+    #the direction to rotate, when performing  circular motion
+    self.num_of_dir = 5
 
   def waypoint_callback(self,msg):
       self.waypoints = []
@@ -128,25 +129,38 @@ class ExecutePath(object):
       self.execute_plan(missed_plan)
 
   def perform_circular_motion(self):
-      circular_waypoints = self.compute_circular_waypoints()
-      circular_plan = self.plan_circular_path(circular_waypoints)
-      self.execute_circular_path(circular_plan)
+      self.curr_pose = self.group.get_current_pose().pose
+      
+      for i in range(0, self.num_of_dir):        
+        circular_waypoints = self.compute_circular_waypoints(i)
+        circular_plan = self.plan_circular_path(circular_waypoints)
+        self.execute_circular_path(circular_plan)
       rospy.loginfo('Circular motion completed')
 
-  def compute_circular_waypoints(self):
-    circular_waypoints =  []
-    #self.path_radius = 0.01
-    increments = np.pi/4
-    curr_pose = self.group.get_current_pose().pose
-    print ("Current  pose:", curr_pose)
-    angle= np.pi/4
-    circular_waypoints.append(curr_pose)
-    point = curr_pose
+  def compute_circular_waypoints(self, i):
+    circular_waypoints =  []    
+    print ("Current  pose:", i)
+    point = self.curr_pose
+    point.orientation.w =  0.9961947
+    turn_angle = 0.017452#0.0436194#0.0871557
+    if (i==0):
+      point.orientation.y =  turn_angle
 
-    point.orientation.x =  0.0
-    point.orientation.y =  -0.422
-    point.orientation.z =  0.0
-    point.orientation.w =  0.906
+    elif (i==1):
+      point.orientation.x =  turn_angle
+
+    elif (i==2):
+      point.orientation.y =  -turn_angle
+
+    elif (i==3):
+      point.orientation.x =  -turn_angle
+
+    elif (i==4):
+      circular_waypoints.append(self.curr_pose)
+
+    else:
+      circular_waypoints = []
+
     circular_waypoints.append(point)
 
   #  point.orientation.x =  0.35
