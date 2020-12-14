@@ -58,6 +58,9 @@ rosrun teleop_twist_keyboard teleop_twist_keyboard.py
 ```
 Click on the publish point feature and then click on one of the cubes in the octomap. This should populate an interactive marker at the location of the cube.
 
+![](images/fetch.gif)
+
+
 Once you have at least three (four preferred) markers up,  you will be able  to see a plane marked by these points and also a lawnmower path defined by this plane, at a height offset.
 
 ### Using the GUI
